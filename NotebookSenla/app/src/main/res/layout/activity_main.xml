@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.9"
+        tools:listitem="@layout/recycler_view_item" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/createNoteButton"
+        android:layout_width="200dp"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="@dimen/small_margin"
+        android:layout_weight="0.09"
+        android:backgroundTint="@color/pink"
+        android:text="@string/activity_main_create_note_label"
+        android:textAllCaps="false" />
+</LinearLayout>
