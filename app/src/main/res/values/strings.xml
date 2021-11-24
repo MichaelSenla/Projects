@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">NotebookSenla</string>
+
+    <string name="activity_main_create_note_label">Создать заметку</string>
+
+    <string name="activity_note_save_note_label">Сохранить заметку</string>
 </resources>
