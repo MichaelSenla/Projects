@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var adapter: RecyclerViewAdapter
+    private lateinit var filesAdapter: RecyclerViewAdapter
     private lateinit var documentsDirectory: File
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,24 +28,20 @@ class MainActivity : AppCompatActivity() {
             documentsDirectory.mkdir()
         }
 
-        binding.createNoteButton.setOnClickListener {
-            startActivity(Intent(this@MainActivity, NoteActivity::class.java))
-        }
-        setAdapter(listOfFiles = documentsDirectory)
-    }
-
-    override fun onResume() {
-        adapter.submitList(documentsDirectory.listFiles()?.toMutableList())
-
-        super.onResume()
-    }
-
-    private fun setAdapter(listOfFiles: File) {
-        binding.recyclerView.adapter = RecyclerViewAdapter { position ->
+        filesAdapter = RecyclerViewAdapter { position ->
             startActivity(Intent(this@MainActivity, NoteActivity::class.java)
                 .apply { putExtra(ITEM_POSITION_EXTRA, position) })
         }
-        adapter = binding.recyclerView.adapter as RecyclerViewAdapter
-        adapter.submitList(listOfFiles.listFiles()?.toMutableList())
+        binding.recyclerView.adapter = filesAdapter
+        filesAdapter.submitList(documentsDirectory.listFiles()?.toList())
+        binding.createNoteButton.setOnClickListener {
+            startActivity(Intent(this@MainActivity, NoteActivity::class.java))
+        }
+    }
+
+    override fun onStart() {
+        filesAdapter.submitList((File(filesDir, DOCUMENTS).listFiles()?.toList()))
+
+        super.onStart()
     }
 }

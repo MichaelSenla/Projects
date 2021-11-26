@@ -13,7 +13,7 @@ import java.util.*
 class RecyclerViewAdapter(private val itemClickListener: (Int) -> Unit) :
     ListAdapter<File, RecyclerViewAdapter.ViewHolder>(DiffCallback()) {
 
-    private val dateFormatter = SimpleDateFormat(DATE_FORMAT, Locale.US)
+    private val dateFormatter = SimpleDateFormat(DATE_FORMAT, Locale.getDefault())
 
     companion object {
         private const val DATE_FORMAT = "dd-MM-yyyy"
@@ -30,22 +30,22 @@ class RecyclerViewAdapter(private val itemClickListener: (Int) -> Unit) :
     class ViewHolder(private val binding: RecyclerViewItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(file: File, dateFormatter: SimpleDateFormat, itemClickListener: (Int) -> Unit) {
+        fun bind(file: File, dateFormatter: SimpleDateFormat) {
             binding.apply {
                 noteTitle.text = file.name
                 noteCreatingDate.text = dateFormatter.format(file.lastModified())
-            }
-            itemView.setOnClickListener {
-                itemClickListener(adapterPosition)
             }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(RecyclerViewItemBinding.inflate(LayoutInflater.from(parent.context)))
+            .apply { itemView.setOnClickListener {
+                itemClickListener(adapterPosition)
+            } }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position), dateFormatter, itemClickListener)
+        holder.bind(getItem(position), dateFormatter)
     }
 }

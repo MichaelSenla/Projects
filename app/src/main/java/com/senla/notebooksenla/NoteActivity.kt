@@ -4,8 +4,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.senla.notebooksenla.MainActivity.Companion.ITEM_POSITION_EXTRA
 import com.senla.notebooksenla.databinding.ActivityNoteBinding
-import java.io.File
-import kotlin.properties.Delegates
 
 class NoteActivity : AppCompatActivity() {
 
@@ -14,7 +12,7 @@ class NoteActivity : AppCompatActivity() {
     }
 
     private lateinit var binding: ActivityNoteBinding
-    private var position by Delegates.notNull<Int>()
+    private var position = intent.getIntExtra(ITEM_POSITION_EXTRA, ITEM_POSITION_DEFAULT_VALUE)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,10 +21,9 @@ class NoteActivity : AppCompatActivity() {
 
         val noteFile = NoteFile(this)
         val editText = binding.noteInputEditText
-        position = intent.getIntExtra(ITEM_POSITION_EXTRA, ITEM_POSITION_DEFAULT_VALUE)
 
         if (position != ITEM_POSITION_DEFAULT_VALUE) {
-            editText.setText(noteFile.setFile(position = position))
+            editText.setText(noteFile.getFileContentByPosition(position = position))
         }
 
         binding.saveNoteButton.setOnClickListener {
