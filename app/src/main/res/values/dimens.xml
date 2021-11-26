@@ -3,7 +3,4 @@
     <dimen name="little_margin">4dp</dimen>
     <dimen name="small_margin">8dp</dimen>
     <dimen name="medium_margin">16dp</dimen>
-
-    <dimen name="medium_text_size">16sp</dimen>
-    <dimen name="big_text_size">24sp</dimen>
 </resources>

@@ -2,22 +2,19 @@ package com.senla.notebooksenla
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.senla.notebooksenla.MainActivity.Companion.ITEM_CLICKED_EXTRA
-import com.senla.notebooksenla.RecyclerViewAdapter.Companion.ITEM_CLICKED_DEFAULT_VALUE
+import com.senla.notebooksenla.MainActivity.Companion.ITEM_POSITION_EXTRA
 import com.senla.notebooksenla.databinding.ActivityNoteBinding
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
+import kotlin.properties.Delegates
 
 class NoteActivity : AppCompatActivity() {
 
     companion object {
-        private const val TIME_PATTERN = "dd/M/yyyy"
-        val listOfFilesData: MutableList<Pair<String, String>> = mutableListOf()
+        const val ITEM_POSITION_DEFAULT_VALUE = -1
     }
 
     private lateinit var binding: ActivityNoteBinding
-    private lateinit var file: File
+    private var position by Delegates.notNull<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,26 +22,19 @@ class NoteActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val noteFile = NoteFile(this)
-        if (intent.getIntExtra(ITEM_CLICKED_EXTRA, ITEM_CLICKED_DEFAULT_VALUE)
-            != ITEM_CLICKED_DEFAULT_VALUE) {
-            file = noteFile.generateFile(listOfFilesData[intent
-                .getIntExtra(ITEM_CLICKED_EXTRA, ITEM_CLICKED_DEFAULT_VALUE)].first)
-            binding.noteInputEditText.setText(file.readText())
+        val editText = binding.noteInputEditText
+        position = intent.getIntExtra(ITEM_POSITION_EXTRA, ITEM_POSITION_DEFAULT_VALUE)
+
+        if (position != ITEM_POSITION_DEFAULT_VALUE) {
+            editText.setText(noteFile.setFile(position = position))
         }
 
         binding.saveNoteButton.setOnClickListener {
-            val noteName = binding.noteInputEditText.text.lines()[0].trim()
-            val currentDate = SimpleDateFormat(TIME_PATTERN).format((Date()))
-
-            file = noteFile.generateFile(noteName)
-            file.writeText(binding.noteInputEditText.text.toString())
-
-            if (intent.getIntExtra(ITEM_CLICKED_EXTRA, ITEM_CLICKED_DEFAULT_VALUE)
-                != ITEM_CLICKED_DEFAULT_VALUE) {
-                listOfFilesData[intent.getIntExtra(ITEM_CLICKED_EXTRA,
-                    ITEM_CLICKED_DEFAULT_VALUE)] = Pair(noteName, currentDate)
+            if (position == ITEM_POSITION_DEFAULT_VALUE) {
+                noteFile.generateFile(
+                    noteName = editText.text.lines()[0].trim()).writeText(editText.text.toString())
             } else {
-                listOfFilesData.add(Pair(noteName, currentDate))
+                noteFile.editFile(position = position, editText.text.toString())
             }
         }
     }

@@ -3,42 +3,49 @@ package com.senla.notebooksenla
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.senla.notebooksenla.NoteActivity.Companion.listOfFilesData
 import com.senla.notebooksenla.databinding.ActivityMainBinding
 import java.io.File
 
-class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListener {
+class MainActivity : AppCompatActivity() {
 
     companion object {
         const val DOCUMENTS = "documents"
-        const val ITEM_CLICKED_EXTRA = "ITEM_CLICKED_EXTRA"
+        const val ITEM_POSITION_EXTRA = "ITEM_POSITION_EXTRA"
     }
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var adapter: RecyclerViewAdapter
+    private lateinit var documentsDirectory: File
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        File(filesDir, DOCUMENTS).mkdir()
-        binding.recyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
+        documentsDirectory = File(filesDir, DOCUMENTS)
+
+        if (documentsDirectory.exists().not()) {
+            documentsDirectory.mkdir()
+        }
+
         binding.createNoteButton.setOnClickListener {
             startActivity(Intent(this@MainActivity, NoteActivity::class.java))
         }
+        setAdapter(listOfFiles = documentsDirectory)
     }
 
     override fun onResume() {
-        binding.recyclerView.adapter = RecyclerViewAdapter(listOfFilesData,
-            this@MainActivity)
+        adapter.submitList(documentsDirectory.listFiles()?.toMutableList())
 
         super.onResume()
     }
 
-    override fun onItemClick(position: Int) {
-        startActivity(Intent(this, NoteActivity::class.java).apply {
-            putExtra(ITEM_CLICKED_EXTRA, position)
-        })
+    private fun setAdapter(listOfFiles: File) {
+        binding.recyclerView.adapter = RecyclerViewAdapter { position ->
+            startActivity(Intent(this@MainActivity, NoteActivity::class.java)
+                .apply { putExtra(ITEM_POSITION_EXTRA, position) })
+        }
+        adapter = binding.recyclerView.adapter as RecyclerViewAdapter
+        adapter.submitList(listOfFiles.listFiles()?.toMutableList())
     }
 }

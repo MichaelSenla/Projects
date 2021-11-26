@@ -2,47 +2,50 @@ package com.senla.notebooksenla
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.senla.notebooksenla.databinding.RecyclerViewItemBinding
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
-class RecyclerViewAdapter(private val list: List<Pair<String, String>> = listOf(Pair("", "")),
-    private val listener: OnItemClickListener) :
-    RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
+class RecyclerViewAdapter(private val itemClickListener: (Int) -> Unit) :
+    ListAdapter<File, RecyclerViewAdapter.ViewHolder>(DiffCallback()) {
+
+    private val dateFormatter = SimpleDateFormat(DATE_FORMAT, Locale.US)
 
     companion object {
-        const val ITEM_CLICKED_DEFAULT_VALUE = -1
+        private const val DATE_FORMAT = "dd-MM-yyyy"
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(
-            RecyclerViewItemBinding.inflate(LayoutInflater.from(parent.context)), listener)
+    class DiffCallback : DiffUtil.ItemCallback<File>() {
+
+        override fun areItemsTheSame(oldItem: File, newItem: File): Boolean = oldItem == newItem
+
+        override fun areContentsTheSame(oldItem: File, newItem: File): Boolean =
+            oldItem.readLines() == newItem.readLines()
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.apply {
-            noteTitle.text = list[position].first
-            notesChangeDate.text = list[position].second
-        }
-    }
-
-    override fun getItemCount(): Int {
-        return list.size
-    }
-
-    inner class ViewHolder(binding: RecyclerViewItemBinding, listener: OnItemClickListener) :
+    class ViewHolder(private val binding: RecyclerViewItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        val noteTitle = binding.noteTitle
-        val notesChangeDate = binding.noteCreatingDate
-
-        init {
+        fun bind(file: File, dateFormatter: SimpleDateFormat, itemClickListener: (Int) -> Unit) {
+            binding.apply {
+                noteTitle.text = file.name
+                noteCreatingDate.text = dateFormatter.format(file.lastModified())
+            }
             itemView.setOnClickListener {
-                listener.onItemClick(adapterPosition)
+                itemClickListener(adapterPosition)
             }
         }
     }
 
-    interface OnItemClickListener {
-        fun onItemClick(position: Int = ITEM_CLICKED_DEFAULT_VALUE)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        return ViewHolder(RecyclerViewItemBinding.inflate(LayoutInflater.from(parent.context)))
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(getItem(position), dateFormatter, itemClickListener)
     }
 }
