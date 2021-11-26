@@ -33,7 +33,6 @@ class MainActivity : AppCompatActivity() {
                 .apply { putExtra(ITEM_POSITION_EXTRA, position) })
         }
         binding.recyclerView.adapter = filesAdapter
-        filesAdapter.submitList(documentsDirectory.listFiles()?.toList())
         binding.createNoteButton.setOnClickListener {
             startActivity(Intent(this@MainActivity, NoteActivity::class.java))
         }
