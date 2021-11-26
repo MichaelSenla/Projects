@@ -18,7 +18,7 @@
         android:layout_height="0dp"
         android:layout_gravity="center|bottom"
         android:layout_marginBottom="@dimen/medium_margin"
-        android:layout_weight="0.1"
+        android:layout_weight="0.09"
         android:backgroundTint="@color/pink"
         android:text="@string/activity_note_save_note_label"
         android:textAllCaps="false" />
